@@ -211,6 +211,8 @@ parser.command('update')
     required: false,
     flag: true
   })
+  .option('timeout', timeoutOption)
+  .option('name', nameOption)
   .callback(function(opts) {
     controller.update(opts)
       .then(closeSuccessfulCommand, closeFailedCommand);

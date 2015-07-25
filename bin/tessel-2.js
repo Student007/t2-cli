@@ -196,6 +196,27 @@ parser.command('rename')
   .option('timeout', timeoutOption)
   .help('Change the name of a Tessel to something new.');
 
+parser.command('update')
+  .option('build', {
+    abbr: 'b',
+    required: false,
+  })
+  .option('list', {
+    abbr: 'l',
+    required: false,
+    flag: true
+  })
+  .option('force', {
+    abbr: 'f',
+    required: false,
+    flag: true
+  })
+  .callback(function(opts) {
+    controller.update(opts)
+      .then(closeSuccessfulCommand, closeFailedCommand);
+  })
+  .help('Update the Tessel firmware and openWRT image');
+
 
 module.exports = function(args) {
   parser.parse(args);

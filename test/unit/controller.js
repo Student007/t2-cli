@@ -6,7 +6,11 @@ var Seeker = require('../../lib/discover.js');
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 var logs = require('../../lib/logs');
-
+var osenv = require('osenv');
+var path = require('path');
+var authPath = path.join(osenv.home(), '.tessel');
+var idrsa = 'id_rsa';
+var authKey = path.join(authPath, idrsa);
 
 function newTessel(options) {
   var tessel = new Tessel({
@@ -44,7 +48,6 @@ exports['controller.closeTesselConnections'] = {
 
   callsCloseOnAllAuthorizedLANConnections: function(test) {
     test.expect(3);
-
     var a = newTessel({
       sandbox: this.sandbox,
       authorized: true,
@@ -367,10 +370,6 @@ exports['Tessel.list'] = {
     this.seeker = this.sandbox.stub(Seeker, 'TesselSeeker', function Seeker() {
       this.start = function(opts) {
         self.activeSeeker = this;
-        this.msg = {
-          noAuth: 'No Authorized Tessels Found.',
-          auth: 'No Tessels Found.'
-        };
         if (opts.timeout && typeof opts.timeout === 'number') {
           setTimeout(this.stop, opts.timeout);
         }
@@ -519,10 +518,6 @@ exports['Tessel.get'] = {
     this.seeker = this.sandbox.stub(Seeker, 'TesselSeeker', function Seeker() {
       this.start = function(opts) {
         self.activeSeeker = this;
-        this.msg = {
-          noAuth: 'No Authorized Tessels Found.',
-          auth: 'No Tessels Found.'
-        };
         if (opts.timeout && typeof opts.timeout === 'number') {
           setTimeout(this.stop, opts.timeout);
         }
@@ -553,21 +548,21 @@ exports['Tessel.get'] = {
 
   oneNamedTessel: function(test) {
     test.expect(6);
-
+    console.log('Tessel.get - oneNamedTessel');
     controller.closeTesselConnections.returns(Promise.resolve());
-
     var a = newTessel({
       sandbox: this.sandbox,
       authorized: true,
       type: 'LAN',
       name: 'the_name'
     });
-
     Tessel.get({
-        timeout: 0.01,
+        timeout: 0.1,
+        key: authKey,
         name: 'the_name'
       })
       .then(function() {
+        console.log('Tessel.get done');
         test.equal(this.reconcileTessels.callCount, 0);
         test.equal(this.runHeuristics.callCount, 0);
         test.equal(this.closeTesselConnections.callCount, 1);
@@ -593,7 +588,8 @@ exports['Tessel.get'] = {
     });
 
     Tessel.get({
-        timeout: 0.01
+        timeout: 0.01,
+        key: authKey
       })
       .then(function() {
         test.equal(this.reconcileTessels.callCount, 0);
@@ -627,7 +623,8 @@ exports['Tessel.get'] = {
     });
 
     Tessel.get({
-        timeout: 0.01
+        timeout: 0.01,
+        key: authKey
       })
       .then(function() {
         test.equal(this.reconcileTessels.callCount, 1);

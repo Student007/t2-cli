@@ -2,7 +2,7 @@ var sinon = require('sinon');
 var cli = require('../../bin/tessel-2');
 var controller = require('../../lib/controller');
 var logs = require('../../lib/logs');
-
+var TESSEL_AUTH_KEY = require('../../lib/tessel/provision.js').TESSEL_AUTH_KEY;
 
 // If the defaults are intentionally changed in bin-tessel-2,
 // then they must be changed here as well. This ensures that the
@@ -16,6 +16,13 @@ var defaults = {
     help: 'Set timeout in seconds for scanning for networked tessels',
     default: 5,
     name: 'timeout',
+  },
+  key: {
+    required: false,
+    metavar: 'PRIVATEKEY',
+    abbr: 'i',
+    default: TESSEL_AUTH_KEY,
+    help: 'RSA key for authorization with your Tessel'
   },
   name: {
     metavar: 'NAME',
@@ -141,6 +148,7 @@ exports['Tessel (cli: update)'] = {
       0: 'update',
       version: 42,
       _: ['update'],
+      key: TESSEL_AUTH_KEY,
       timeout: 5
     });
 

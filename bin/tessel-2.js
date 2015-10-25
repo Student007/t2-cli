@@ -6,9 +6,17 @@ var controller = require('../lib/controller');
 var key = require('../lib/key');
 var init = require('../lib/init');
 var logs = require('../lib/logs');
+var TESSEL_AUTH_KEY = require('../lib/tessel/provision.js').TESSEL_AUTH_KEY;
 
 function makeCommand(commandName) {
   return parser.command(commandName)
+    .option('key', {
+      required: false,
+      metavar: 'PRIVATEKEY',
+      abbr: 'i',
+      default: TESSEL_AUTH_KEY,
+      help: 'RSA key for authorization with your Tessel'
+    })
     .option('timeout', {
       abbr: 't',
       metavar: 'TIMEOUT',
